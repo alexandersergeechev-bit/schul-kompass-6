@@ -1,4 +1,4 @@
-/* style.css — Основные стили приложения */
+/* style.css — Основные стили приложения SchulKompass */
 
 :root {
   --bg-color: #f4f7f6;
@@ -10,6 +10,10 @@
   --neutral-bar-color: #95a5a6;
   --border-radius: 12px;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  
+  /* Цветовые темы для карточек профилей */
+  --veronika-color: #9b59b6;
+  --milana-color: #e67e22;
 }
 
 body {
@@ -27,7 +31,25 @@ body {
   max-width: 800px;
 }
 
-/* Шапка с кнопкой возврата */
+/* -------------------------------------------------------------------
+   1. ШАПКА И НАВИГАЦИЯ
+   ------------------------------------------------------------------- */
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--accent-color);
+}
+
+header p {
+  margin: 5px 0 0 0;
+  color: var(--text-secondary);
+}
+
 .header-with-back {
   display: flex;
   align-items: center;
@@ -70,6 +92,9 @@ body {
   color: #ffffff;
 }
 
+/* -------------------------------------------------------------------
+   2. СТАТИСТИКА И КАРТОЧКИ УЧЕНИКОВ
+   ------------------------------------------------------------------- */
 .stats-summary {
   display: grid;
   grid-template-columns: 1fr;
@@ -129,9 +154,15 @@ body {
   margin-top: 8px;
 }
 
+.progress-bar-bg.large {
+  height: 16px;
+  border-radius: 8px;
+}
+
 .progress-bar-fill {
   height: 100%;
   width: 0%;
+  background-color: var(--accent-color);
   border-radius: 5px;
   transition: width 0.4s ease-in-out, background-color 0.4s ease-in-out;
 }
@@ -223,7 +254,129 @@ body {
   padding-bottom: 8px;
 }
 
-/* Плашки дней недели */
+/* -------------------------------------------------------------------
+   3. ГЛАВНАЯ СТРАНИЦА (INDEX.HTML) — СТИЛИ ДЛЯ КОМАНДНОЙ ЦЕЛИ И ПРОФИЛЕЙ
+   ------------------------------------------------------------------- */
+
+/* Блок командной цели */
+.goal-card {
+  border-left: 5px solid var(--accent-color);
+}
+
+.goal-desc {
+  color: var(--text-secondary);
+  margin-top: -5px;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+.team-progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 5px;
+}
+
+.reward-box {
+  margin-top: 20px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e0;
+  padding: 12px 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.reward-box h3 {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.reward-box p {
+  margin: 0;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #e67e22;
+}
+
+/* Сетка выбора профилей */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+@media (min-width: 500px) {
+  .profile-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+}
+
+.profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.profile-card h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.profile-card p {
+  margin: 4px 0 12px 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.profile-score-preview {
+  font-size: 0.9rem;
+  font-weight: bold;
+  background: #edf2f7;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+/* Персональные акценты для карточек */
+.veronika-theme:hover {
+  border-color: var(--veronika-color);
+}
+
+.veronika-theme h3 {
+  color: var(--veronika-color);
+}
+
+.milana-theme:hover {
+  border-color: var(--milana-color);
+}
+
+.milana-theme h3 {
+  color: var(--milana-color);
+}
+
+/* -------------------------------------------------------------------
+   4. ДНИ НЕДЕЛИ И СПИСКИ
+   ------------------------------------------------------------------- */
 .week-pills-label {
   margin-bottom: 10px;
 }
@@ -247,6 +400,10 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+}
+
+.day-pill.weekend-pill {
+  background: #fcf3cf;
 }
 
 .day-pill:hover {
