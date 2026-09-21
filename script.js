@@ -184,15 +184,16 @@ function renderWeekPills() {
 
     const dateStr = formatDateToYYYYMMDD(tempDate);
     const isSelected = dateStr === selectedDate;
+    const isWeekend = (i === 5 || i === 6); // Суббота (5) или Воскресенье (6)
 
     const pill = document.createElement("div");
-    pill.className = `day-pill ${isSelected ? 'active' : ''}`;
+    pill.className = `day-pill ${isSelected ? 'active' : ''} ${isWeekend ? 'weekend-pill' : ''}`;
     
     const dayNum = String(tempDate.getDate()).padStart(2, '0');
     const monthNum = String(tempDate.getMonth() + 1).padStart(2, '0');
 
     pill.innerHTML = `
-      <div class="pill-name">${dayNames[i]}</div>
+      <div class="pill-name">${dayNames[i]} ${isWeekend ? '<br><small>(Wochenende)</small>' : ''}</div>
       <div class="pill-date">${dayNum}.${monthNum}</div>
     `;
 
@@ -223,9 +224,9 @@ function renderTasks() {
   const subjects = timetable[dayOfWeek] || [];
   const dayScores = globalScores[selectedDate] || {};
 
-  // Предметы
-  if (subjects.length === 0) {
-    subjectsContainer.innerHTML = "<p style='color: #7f8c8d;'><em>Wochenende (Выходной день — уроков нет)</em></p>";
+  // Учебные предметы (Отображаются только в рабочие дни)
+  if (dayOfWeek === 0 || dayOfWeek === 6 || subjects.length === 0) {
+    subjectsContainer.innerHTML = "<p style='color: #7f8c8d;'><em>Wochenende (Выходной день — уроки отсутствуют)</em></p>";
   } else {
     subjects.forEach(subject => {
       const savedVal = dayScores[subject] !== undefined ? dayScores[subject] : 0;
@@ -248,7 +249,7 @@ function renderTasks() {
     });
   }
 
-  // Привычки
+  // Привычки и навыки
   dailyHabits.forEach(habit => {
     const savedVal = dayScores[habit.id] !== undefined ? dayScores[habit.id] : 0;
     const row = document.createElement("div");
@@ -291,7 +292,7 @@ function calculateStudentTotals() {
     dailyProgressEl.style.width = `${percent}%`;
   }
 
-  // --- 2. РАСЧЕТ ЗА НЕДЕЛЮ ---
+  // --- 2. РАСЧЕТ ЗА НЕДЕЛЮ (ТОЛЬКО 5 РАБОЧИХ ДНЕЙ ПН-ПТ) ---
   const distToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   const monday = new Date(dateObj);
   monday.setDate(dateObj.getDate() + distToMonday);
@@ -308,7 +309,12 @@ function calculateStudentTotals() {
     const dWeek = tempDate.getDay();
     const dSubjects = timetable[dWeek] || [];
 
-    weeklyMax += (dSubjects.length * 5) + (dailyHabits.length * 5);
+    // База 100% недели строится СТРОГО по 5 рабочим дням (ПН-ПТ, где dWeek от 1 до 5)
+    if (dWeek >= 1 && dWeek <= 5) {
+      weeklyMax += (dSubjects.length * 5) + (dailyHabits.length * 5);
+    }
+
+    // Баллы суммируются за весь период
     dSubjects.forEach(s => { weeklyAchieved += dScores[s] || 0; });
     dailyHabits.forEach(h => { weeklyAchieved += dScores[h.id] || 0; });
   }
@@ -393,7 +399,11 @@ function getMonthStats(scores, timetable, monthStr) {
     const dSubjects = timetable[dWeek] || [];
     const dScores = scores[dateStr] || {};
 
-    max += (dSubjects.length * 5) + (dailyHabits.length * 5);
+    // Учитываем максимумы только рабочих дней для стандартизации месяца
+    if (dWeek >= 1 && dWeek <= 5) {
+      max += (dSubjects.length * 5) + (dailyHabits.length * 5);
+    }
+    
     dSubjects.forEach(s => { achieved += dScores[s] || 0; });
     dailyHabits.forEach(h => { achieved += dScores[h.id] || 0; });
   }
