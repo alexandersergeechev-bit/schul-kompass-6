@@ -4,7 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // -------------------------------------------------------------------
-// 1. КОНФИГУРАЦИЯ FIREBASE (Ключи вашего проекта SchulKompass)
+// 1. КОНФИГУРАЦИЯ FIREBASE
 // -------------------------------------------------------------------
 const firebaseConfig = {
   apiKey: "AIzaSyDKa0bo_wtF08Wwy0vn0JHDnba1Tt_4Riw",
@@ -16,7 +16,6 @@ const firebaseConfig = {
   appId: "1:206897427783:web:ff052ea41b5285bb324862"
 };
 
-// Инициализация приложения и базы данных Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -51,7 +50,20 @@ const dailyHabits = [
 const isIndexPage = window.location.pathname.endsWith("index.html") || window.location.pathname.endsWith("/");
 const isMilanaPage = window.location.pathname.includes("milana.html");
 
-let selectedDate = new Date().toISOString().split('T')[0]; 
+// Вспомогательные функции работы с датами без сдвига часовых поясов
+function formatDateToYYYYMMDD(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function parseLocalDate(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+let selectedDate = formatDateToYYYYMMDD(new Date()); 
 let selectedMonth = selectedDate.substring(0, 7);
 let globalScores = {};
 
@@ -66,6 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
       dateInput.value = selectedDate;
       dateInput.addEventListener("change", (e) => {
         selectedDate = e.target.value;
+        selectedMonth = selectedDate.substring(0, 7);
+        if (monthInput) monthInput.value = selectedMonth;
         renderWeekPills();
         renderTasks();
       });
@@ -92,10 +106,8 @@ function getStudentContext() {
 }
 
 // -------------------------------------------------------------------
-// 3. СИНХРОНИЗАЦИЯ С ОБЛАКОМ FIREBASE
+// 3. СИНХРОНИЗАЦИЯ С FIREBASE
 // -------------------------------------------------------------------
-
-// Получение данных ученицы в реальном времени
 function listenStudentData() {
   const { dbPath } = getStudentContext();
   const studentRef = ref(db, dbPath);
@@ -106,14 +118,12 @@ function listenStudentData() {
   });
 }
 
-// Сохранение выбранного балла в Firebase Realtime Database
 window.updateScore = function(dateStr, itemKey, val) {
   const { dbPath } = getStudentContext();
   const scoreRef = ref(db, `${dbPath}/${dateStr}/${itemKey}`);
   set(scoreRef, parseInt(val, 10));
 };
 
-// Подписка на данные всех детей для Главной страницы (index.html)
 function listenIndexPageData() {
   const allScoresRef = ref(db, 'scores');
 
@@ -122,8 +132,8 @@ function listenIndexPageData() {
     const veronikaScores = data.veronika || {};
     const milanaScores = data.milana || {};
 
-    const currentMonthStr = new Date().toISOString().substring(0, 7);
-    const todayStr = new Date().toISOString().split('T')[0];
+    const currentMonthStr = formatDateToYYYYMMDD(new Date()).substring(0, 7);
+    const todayStr = formatDateToYYYYMMDD(new Date());
 
     const vStats = getMonthStats(veronikaScores, timetableVeronika, currentMonthStr);
     const mStats = getMonthStats(milanaScores, timetableMilana, currentMonthStr);
@@ -152,16 +162,15 @@ function listenIndexPageData() {
 }
 
 // -------------------------------------------------------------------
-// 4. ОТРЕСОВКА ИНТЕРФЕЙСА (Плашки, предметы, привычки, статистика)
+// 4. ОТРЕСОВКА И РАСЧЕТЫ
 // -------------------------------------------------------------------
-
 function renderWeekPills() {
   const container = document.getElementById("week-pills-container");
   if (!container) return;
 
   container.innerHTML = "";
 
-  const current = new Date(selectedDate);
+  const current = parseLocalDate(selectedDate);
   const dayOfWeek = current.getDay();
   const distToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   const monday = new Date(current);
@@ -173,7 +182,7 @@ function renderWeekPills() {
     const tempDate = new Date(monday);
     tempDate.setDate(monday.getDate() + i);
 
-    const dateStr = tempDate.toISOString().split('T')[0];
+    const dateStr = formatDateToYYYYMMDD(tempDate);
     const isSelected = dateStr === selectedDate;
 
     const pill = document.createElement("div");
@@ -209,12 +218,12 @@ function renderTasks() {
   subjectsContainer.innerHTML = "";
   habitsContainer.innerHTML = "";
 
-  const dateObj = new Date(selectedDate);
+  const dateObj = parseLocalDate(selectedDate);
   const dayOfWeek = dateObj.getDay(); 
   const subjects = timetable[dayOfWeek] || [];
   const dayScores = globalScores[selectedDate] || {};
 
-  // Отрисовка предметов
+  // Предметы
   if (subjects.length === 0) {
     subjectsContainer.innerHTML = "<p style='color: #7f8c8d;'><em>Wochenende (Выходной день — уроков нет)</em></p>";
   } else {
@@ -239,7 +248,7 @@ function renderTasks() {
     });
   }
 
-  // Отрисовка привычек
+  // Привычки
   dailyHabits.forEach(habit => {
     const savedVal = dayScores[habit.id] !== undefined ? dayScores[habit.id] : 0;
     const row = document.createElement("div");
@@ -262,9 +271,9 @@ function renderTasks() {
 function calculateStudentTotals() {
   const { timetable } = getStudentContext();
 
-  // 1. За день
+  // --- 1. РАСЧЕТ ЗА ДЕНЬ ---
   const dayScores = globalScores[selectedDate] || {};
-  const dateObj = new Date(selectedDate);
+  const dateObj = parseLocalDate(selectedDate);
   const dayOfWeek = dateObj.getDay();
   const subjects = timetable[dayOfWeek] || [];
 
@@ -282,7 +291,7 @@ function calculateStudentTotals() {
     dailyProgressEl.style.width = `${percent}%`;
   }
 
-  // 2. За неделю (с расчетом процента и бейджей)
+  // --- 2. РАСЧЕТ ЗА НЕДЕЛЮ ---
   const distToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   const monday = new Date(dateObj);
   monday.setDate(dateObj.getDate() + distToMonday);
@@ -293,7 +302,7 @@ function calculateStudentTotals() {
   for (let i = 0; i < 7; i++) {
     const tempDate = new Date(monday);
     tempDate.setDate(monday.getDate() + i);
-    const dateStr = tempDate.toISOString().split('T')[0];
+    const dateStr = formatDateToYYYYMMDD(tempDate);
     const dScores = globalScores[dateStr] || {};
 
     const dWeek = tempDate.getDay();
@@ -307,18 +316,13 @@ function calculateStudentTotals() {
   const weeklyScoreEl = document.getElementById("weekly-score");
   if (weeklyScoreEl) weeklyScoreEl.innerText = `${weeklyAchieved} / ${weeklyMax}`;
 
-  // Расчет процента выполнения за неделю
   const weeklyPercent = weeklyMax > 0 ? Math.round((weeklyAchieved / weeklyMax) * 100) : 0;
-
   const weeklyPercentTextEl = document.getElementById("weekly-percent-text");
   const weeklyProgressBarEl = document.getElementById("weekly-progress");
 
   if (weeklyPercentTextEl) weeklyPercentTextEl.innerText = `${weeklyPercent}%`;
-
   if (weeklyProgressBarEl) {
     weeklyProgressBarEl.style.width = `${weeklyPercent}%`;
-
-    // Динамическая смена цвета шкалы
     if (weeklyPercent >= 70) {
       weeklyProgressBarEl.classList.remove("weekly-progress-low");
       weeklyProgressBarEl.classList.add("weekly-progress-success");
@@ -328,7 +332,7 @@ function calculateStudentTotals() {
     }
   }
 
-  // Обновление бейджей (Bronze >= 70%, Silber >= 80%, Gold >= 90%)
+  // Бейджи недели
   const badgeBronze = document.getElementById("badge-bronze");
   const badgeSilber = document.getElementById("badge-silber");
   const badgeGold = document.getElementById("badge-gold");
@@ -337,31 +341,38 @@ function calculateStudentTotals() {
   if (badgeSilber) badgeSilber.classList.toggle("active", weeklyPercent >= 80);
   if (badgeGold) badgeGold.classList.toggle("active", weeklyPercent >= 90);
 
-  // 3. За месяц
-  let monthlyAchieved = 0;
-  let monthlyMax = 0;
-
-  const [yearStr, monthStr] = selectedMonth.split('-');
-  const year = parseInt(yearStr, 10);
-  const month = parseInt(monthStr, 10);
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dayFormatted = String(day).padStart(2, '0');
-    const dateStr = `${selectedMonth}-${dayFormatted}`;
-    
-    const dObj = new Date(year, month - 1, day);
-    const dWeek = dObj.getDay();
-    const dSubjects = timetable[dWeek] || [];
-    const dScores = globalScores[dateStr] || {};
-
-    monthlyMax += (dSubjects.length * 5) + (dailyHabits.length * 5);
-    dSubjects.forEach(s => { monthlyAchieved += dScores[s] || 0; });
-    dailyHabits.forEach(h => { monthlyAchieved += dScores[h.id] || 0; });
-  }
+  // --- 3. РАСЧЕТ ЗА МЕСЯЦ ---
+  const statsMonth = getMonthStats(globalScores, timetable, selectedMonth);
+  const monthlyAchieved = statsMonth.achieved;
+  const monthlyMax = statsMonth.max;
 
   const monthlyScoreEl = document.getElementById("monthly-score");
   if (monthlyScoreEl) monthlyScoreEl.innerText = `${monthlyAchieved} / ${monthlyMax}`;
+
+  const monthlyPercent = monthlyMax > 0 ? Math.round((monthlyAchieved / monthlyMax) * 100) : 0;
+  const monthlyPercentTextEl = document.getElementById("monthly-percent-text");
+  const monthlyProgressBarEl = document.getElementById("monthly-progress");
+
+  if (monthlyPercentTextEl) monthlyPercentTextEl.innerText = `${monthlyPercent}%`;
+  if (monthlyProgressBarEl) {
+    monthlyProgressBarEl.style.width = `${monthlyPercent}%`;
+    if (monthlyPercent >= 70) {
+      monthlyProgressBarEl.classList.remove("monthly-progress-low");
+      monthlyProgressBarEl.classList.add("weekly-progress-success");
+    } else {
+      monthlyProgressBarEl.classList.remove("weekly-progress-success");
+      monthlyProgressBarEl.classList.add("monthly-progress-low");
+    }
+  }
+
+  // Бейджи месяца
+  const mBadgeBronze = document.getElementById("monthly-badge-bronze");
+  const mBadgeSilber = document.getElementById("monthly-badge-silber");
+  const mBadgeGold = document.getElementById("monthly-badge-gold");
+
+  if (mBadgeBronze) mBadgeBronze.classList.toggle("active", monthlyPercent >= 70);
+  if (mBadgeSilber) mBadgeSilber.classList.toggle("active", monthlyPercent >= 80);
+  if (mBadgeGold) mBadgeGold.classList.toggle("active", monthlyPercent >= 90);
 }
 
 function getMonthStats(scores, timetable, monthStr) {
