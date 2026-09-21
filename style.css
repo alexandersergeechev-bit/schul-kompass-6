@@ -1,0 +1,321 @@
+/* style.css — Основные стили приложения */
+
+:root {
+  --bg-color: #f4f7f6;
+  --card-bg: #ffffff;
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --accent-color: #3498db;
+  --success-color: #2ecc71;
+  --border-radius: 12px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Шапка с кнопкой возврата */
+.header-with-back {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.header-title {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--accent-color);
+}
+
+.header-title p {
+  margin: 5px 0 0 0;
+  color: var(--text-secondary);
+}
+
+.back-btn {
+  display: inline-block;
+  padding: 8px 14px;
+  background-color: #ffffff;
+  color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background-color: var(--accent-color);
+  color: #ffffff;
+}
+
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.stat-card h3 {
+  margin: 0 0 5px 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.stat-card .score {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  border-bottom: 2px solid var(--bg-color);
+  padding-bottom: 8px;
+}
+
+/* Стили для плашек дней недели */
+.week-pills-label {
+  margin-bottom: 10px;
+}
+
+.week-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.day-pill {
+  flex: 1;
+  min-width: 60px;
+  padding: 10px 5px;
+  background: #edf2f7;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.day-pill:hover {
+  background: #e2e8f0;
+}
+
+.day-pill.active {
+  background: var(--accent-color);
+  color: #ffffff;
+  border-color: var(--accent-color);
+  font-weight: bold;
+}
+
+.day-pill .pill-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.day-pill .pill-date {
+  font-size: 0.75rem;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+.date-pickers-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.item-row {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-title {
+  font-weight: 600;
+}
+
+.item-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+select, input[type="date"], input[type="month"] {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e0;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.progress-bar-bg {
+  background: #e2e8f0;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.progress-bar-fill {
+  background: var(--success-color);
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  .header-with-back {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .stat-card {
+    padding: 10px;
+  }
+}
+
+/* Стили для главной страницы index.html */
+.goal-card {
+  background: linear-gradient(135deg, #ffffff 0%, #eef2f5 100%);
+  border: 2px solid #e2e8f0;
+}
+
+.goal-desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.team-progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.progress-bar-bg.large {
+  height: 18px;
+  border-radius: 9px;
+  margin-bottom: 15px;
+}
+
+.reward-box {
+  background: #fff8e1;
+  border-left: 4px solid #f1c40f;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+.reward-box h3 {
+  margin: 0 0 5px 0;
+  font-size: 0.95rem;
+  color: #d35400;
+}
+
+.reward-box p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.profile-card {
+  display: block;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--card-bg);
+  border: 2px solid #e2e8f0;
+  border-radius: var(--border-radius);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-color);
+}
+
+.profile-avatar {
+  font-size: 2.5rem;
+  margin-bottom: 5px;
+}
+
+.profile-card h3 {
+  margin: 5px 0;
+  color: var(--accent-color);
+}
+
+.profile-card p {
+  margin: 0 0 10px 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.profile-score-preview {
+  font-size: 0.9rem;
+  font-weight: bold;
+  background: #edf2f7;
+  padding: 5px 10px;
+  border-radius: 12px;
+  display: inline-block;
+}

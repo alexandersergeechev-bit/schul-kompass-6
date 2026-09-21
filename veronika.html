@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Veronika - Motivation Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Шапка с кнопкой возврата -->
+    <header class="header-with-back">
+      <a href="index.html" class="back-btn">← Zurück (На главную)</a>
+      <div class="header-title">
+        <h1>Veronika (7. Klasse)</h1>
+        <p>Erfolg & Motivation Dashboard</p>
+      </div>
+    </header>
+
+    <!-- Блок со статистикой: День, Неделя, Месяц -->
+    <section class="stats-summary">
+      <div class="stat-card">
+        <h3>Tag (День)</h3>
+        <div class="score" id="daily-score">0 / 0</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="daily-progress"></div></div>
+      </div>
+      <div class="stat-card">
+        <h3>Woche (Неделя)</h3>
+        <div class="score" id="weekly-score">0 / 0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Monat (Месяц)</h3>
+        <div class="score" id="monthly-score">0 / 0</div>
+      </div>
+    </section>
+
+    <!-- Блок выбора даты, месяца и плашки дней недели -->
+    <div class="card">
+      <!-- Плашки дней недели -->
+      <div class="week-pills-label"><strong>Wochentag wählen (Выбор дня):</strong></div>
+      <div class="week-pills" id="week-pills-container"></div>
+
+      <!-- Выбор даты и месяца -->
+      <div class="date-pickers-row">
+        <div>
+          <label for="date-select"><strong>Datum (Дата):</strong> </label>
+          <input type="date" id="date-select">
+        </div>
+        <div>
+          <label for="month-select"><strong>Monat anzeigen (Статистика за месяц):</strong> </label>
+          <input type="month" id="month-select">
+        </div>
+      </div>
+    </div>
+
+    <!-- Учебные предметы -->
+    <div class="card">
+      <h2>Fächer (Предметы)</h2>
+      <div id="subjects-container"></div>
+    </div>
+
+    <!-- Личные качества и социальные навыки -->
+    <div class="card">
+      <h2>Verhalten & Verhaltensweisen (Поведение и навыки)</h2>
+      <div id="habits-container"></div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

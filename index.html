@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familien-Erfolg & Teamwork</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Gemeinsam stark! 🚀</h1>
+      <p>Unser Familien-Erfolg & Teamwork Dashboard</p>
+    </header>
+
+    <!-- Мотивационный блок командной цели -->
+    <section class="card goal-card">
+      <h2>🏆 Unser Monatsziel (Наша общая цель на месяц)</h2>
+      <p class="goal-desc">Gemeinsam Punkte sammeln und belohnt werden! (Собираем баллы вместе и получаем награду!)</p>
+      
+      <div class="team-progress-info">
+        <span>Gesamtpunkte: <strong id="team-total-score">0 / 0</strong></span>
+        <span id="team-percent-text">0%</span>
+      </div>
+      <div class="progress-bar-bg large">
+        <div class="progress-bar-fill" id="team-progress-bar"></div>
+      </div>
+
+      <div class="reward-box">
+        <h3>🎁 Belohnung für diesen Monat (Награда за месяц):</h3>
+        <p>Familienausflug oder Restaurantbesuch! 🍕🎳</p>
+      </div>
+    </section>
+
+    <!-- Навигация: выбор профиля ребенка -->
+    <section class="card">
+      <h2>Wer bist du? (Выбери свой профиль)</h2>
+      <div class="profile-grid">
+        <a href="veronika.html" class="profile-card veronika-theme">
+          <div class="profile-avatar">👧</div>
+          <h3>Veronika</h3>
+          <p>7. Klasse</p>
+          <div class="profile-score-preview">Heute: <span id="veronika-today-preview">0</span> Pkt.</div>
+        </a>
+
+        <a href="milana.html" class="profile-card milana-theme">
+          <div class="profile-avatar">👧</div>
+          <h3>Milana</h3>
+          <p>6. Klasse</p>
+          <div class="profile-score-preview">Heute: <span id="milana-today-preview">0</span> Pkt.</div>
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
