@@ -282,7 +282,7 @@ function calculateStudentTotals() {
     dailyProgressEl.style.width = `${percent}%`;
   }
 
-  // 2. За неделю
+  // 2. За неделю (с расчетом процента и бейджей)
   const distToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   const monday = new Date(dateObj);
   monday.setDate(dateObj.getDate() + distToMonday);
@@ -306,6 +306,36 @@ function calculateStudentTotals() {
 
   const weeklyScoreEl = document.getElementById("weekly-score");
   if (weeklyScoreEl) weeklyScoreEl.innerText = `${weeklyAchieved} / ${weeklyMax}`;
+
+  // Расчет процента выполнения за неделю
+  const weeklyPercent = weeklyMax > 0 ? Math.round((weeklyAchieved / weeklyMax) * 100) : 0;
+
+  const weeklyPercentTextEl = document.getElementById("weekly-percent-text");
+  const weeklyProgressBarEl = document.getElementById("weekly-progress");
+
+  if (weeklyPercentTextEl) weeklyPercentTextEl.innerText = `${weeklyPercent}%`;
+
+  if (weeklyProgressBarEl) {
+    weeklyProgressBarEl.style.width = `${weeklyPercent}%`;
+
+    // Динамическая смена цвета шкалы
+    if (weeklyPercent >= 70) {
+      weeklyProgressBarEl.classList.remove("weekly-progress-low");
+      weeklyProgressBarEl.classList.add("weekly-progress-success");
+    } else {
+      weeklyProgressBarEl.classList.remove("weekly-progress-success");
+      weeklyProgressBarEl.classList.add("weekly-progress-low");
+    }
+  }
+
+  // Обновление бейджей (Bronze >= 70%, Silber >= 80%, Gold >= 90%)
+  const badgeBronze = document.getElementById("badge-bronze");
+  const badgeSilber = document.getElementById("badge-silber");
+  const badgeGold = document.getElementById("badge-gold");
+
+  if (badgeBronze) badgeBronze.classList.toggle("active", weeklyPercent >= 70);
+  if (badgeSilber) badgeSilber.classList.toggle("active", weeklyPercent >= 80);
+  if (badgeGold) badgeGold.classList.toggle("active", weeklyPercent >= 90);
 
   // 3. За месяц
   let monthlyAchieved = 0;

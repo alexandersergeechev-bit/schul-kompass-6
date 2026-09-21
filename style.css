@@ -7,6 +7,7 @@
   --text-secondary: #7f8c8d;
   --accent-color: #3498db;
   --success-color: #2ecc71;
+  --neutral-bar-color: #95a5a6;
   --border-radius: 12px;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
@@ -84,6 +85,17 @@ body {
   text-align: center;
 }
 
+/* Расширенная карточка недели для бейджей */
+.stat-card-wide {
+  grid-column: span 1;
+}
+
+@media (min-width: 600px) {
+  .stats-summary {
+    grid-template-columns: 1fr 1.5fr 1fr;
+  }
+}
+
 .stat-card h3 {
   margin: 0 0 5px 0;
   font-size: 0.9rem;
@@ -94,6 +106,111 @@ body {
   font-size: 1.3rem;
   font-weight: bold;
   color: var(--accent-color);
+}
+
+.score-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.percent-badge {
+  font-size: 0.85rem;
+  font-weight: bold;
+  background: #edf2f7;
+  color: var(--text-secondary);
+  padding: 2px 7px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Шкала прогресса */
+.progress-bar-bg {
+  background: #e2e8f0;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 5px;
+  transition: width 0.4s ease-in-out, background-color 0.4s ease-in-out;
+}
+
+/* Динамические цвета для шкалы недели */
+.progress-bar-fill.weekly-progress-low {
+  background-color: var(--neutral-bar-color);
+}
+
+.progress-bar-fill.weekly-progress-success {
+  background-color: var(--success-color);
+  box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+
+/* --- БЕЙДЖИ УРОВНЕЙ (LEVEL BADGES) --- */
+.level-badges {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed #edf2f7;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.35;
+  filter: grayscale(100%);
+  transform: scale(0.9);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.badge-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.badge-name {
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.badge-target {
+  font-size: 0.65rem;
+  opacity: 0.8;
+}
+
+/* Активные бейджи (при достижении порога) */
+.badge.active {
+  opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+#badge-bronze.active {
+  color: #d35400;
+}
+
+#badge-silber.active {
+  color: #7f8c8d;
+}
+
+#badge-gold.active {
+  color: #f39c12;
+  animation: goldPulse 2s infinite ease-in-out;
+}
+
+@keyframes goldPulse {
+  0% { transform: scale(1.05); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1.05); }
 }
 
 .card {
@@ -196,21 +313,6 @@ select, input[type="date"], input[type="month"] {
   border: 1px solid #cbd5e0;
   font-size: 0.95rem;
   font-family: inherit;
-}
-
-.progress-bar-bg {
-  background: #e2e8f0;
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 5px;
-}
-
-.progress-bar-fill {
-  background: var(--success-color);
-  height: 100%;
-  width: 0%;
-  transition: width 0.3s ease;
 }
 
 @media (max-width: 600px) {
