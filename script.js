@@ -22,9 +22,10 @@ const db = getDatabase(app);
 // -------------------------------------------------------------------
 // 2. ДАННЫЕ РАСПИСАНИЯ И НАВЫКОВ
 // -------------------------------------------------------------------
+// Ключи предметов сделаны без спецсимволов для надежного сохранения в Firebase
 const timetableVeronika = {
   1: ["Deutsch", "Mathe", "Erdkunde"],
-  2: ["Kunst", "W. u. N.", "Musik"],
+  2: ["Kunst", "WUN", "Musik"],
   3: ["Spanisch", "Geschichte", "Englisch"],
   4: ["Deutsch", "Mathe", "Sport"],
   5: ["Englisch", "Physik", "Spanisch"]
@@ -34,8 +35,14 @@ const timetableMilana = {
   1: ["Mathe", "Chemie", "Geschichte"],
   2: ["Spanisch", "Musik", "Deutsch"],
   3: ["Englisch", "Deutsch", "Mathe"],
-  4: ["Spanisch", "W. u. N.", "Erdkunde"],
+  4: ["Spanisch", "WUN", "Erdkunde"],
   5: ["Physik", "Englisch", "Klassenlehrerstunde"]
+};
+
+// Словарь для понятных названий предметов в интерфейсе
+const subjectLabels = {
+  "WUN": "W. u. N. (Ценности и нормы)",
+  "Klassenlehrerstunde": "Klassenlehrerstunde (Классный час)"
 };
 
 const dailyHabits = [
@@ -50,7 +57,7 @@ const dailyHabits = [
 const isIndexPage = window.location.pathname.endsWith("index.html") || window.location.pathname.endsWith("/");
 const isMilanaPage = window.location.pathname.includes("milana.html");
 
-// Вспомогательные функции работы с датами без сдвига часовых поясов
+// Вспомогательные функции работы с датами
 function formatDateToYYYYMMDD(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -184,7 +191,7 @@ function renderWeekPills() {
 
     const dateStr = formatDateToYYYYMMDD(tempDate);
     const isSelected = dateStr === selectedDate;
-    const isWeekend = (i === 5 || i === 6); // Суббота (5) или Воскресенье (6)
+    const isWeekend = (i === 5 || i === 6);
 
     const pill = document.createElement("div");
     pill.className = `day-pill ${isSelected ? 'active' : ''} ${isWeekend ? 'weekend-pill' : ''}`;
@@ -224,18 +231,20 @@ function renderTasks() {
   const subjects = timetable[dayOfWeek] || [];
   const dayScores = globalScores[selectedDate] || {};
 
-  // Учебные предметы (Отображаются только в рабочие дни)
+  // Учебные предметы
   if (dayOfWeek === 0 || dayOfWeek === 6 || subjects.length === 0) {
     subjectsContainer.innerHTML = "<p style='color: #7f8c8d;'><em>Wochenende (Выходной день — уроки отсутствуют)</em></p>";
   } else {
-    subjects.forEach(subject => {
-      const savedVal = dayScores[subject] !== undefined ? dayScores[subject] : 0;
+    subjects.forEach(subjectKey => {
+      const savedVal = dayScores[subjectKey] !== undefined ? dayScores[subjectKey] : 0;
+      const displayName = subjectLabels[subjectKey] || subjectKey;
+      
       const row = document.createElement("div");
       row.className = "item-row";
       row.innerHTML = `
         <div class="item-main">
-          <span class="item-title">${subject}</span>
-          <select onchange="updateScore('${selectedDate}', '${subject}', this.value)">
+          <span class="item-title">${displayName}</span>
+          <select onchange="updateScore('${selectedDate}', '${subjectKey}', this.value)">
             <option value="0" ${savedVal == 0 ? 'selected' : ''}>0 - Nicht erledigt</option>
             <option value="2" ${savedVal == 2 ? 'selected' : ''}>2 - Grobe Fehler</option>
             <option value="3" ${savedVal == 3 ? 'selected' : ''}>3 - Ohne Gemini / Papa</option>
@@ -285,14 +294,16 @@ function calculateStudentTotals() {
   dailyHabits.forEach(h => { dailyAchieved += dayScores[h.id] || 0; });
 
   const dailyScoreEl = document.getElementById("daily-score");
+  const dailyPercentTextEl = document.getElementById("daily-percent-text");
   const dailyProgressEl = document.getElementById("daily-progress");
-  if (dailyScoreEl) dailyScoreEl.innerText = `${dailyAchieved} / ${dailyMax}`;
-  if (dailyProgressEl) {
-    const percent = dailyMax > 0 ? (dailyAchieved / dailyMax) * 100 : 0;
-    dailyProgressEl.style.width = `${percent}%`;
-  }
 
-  // --- 2. РАСЧЕТ ЗА НЕДЕЛЮ (ТОЛЬКО 5 РАБОЧИХ ДНЕЙ ПН-ПТ) ---
+  const dailyPercent = dailyMax > 0 ? Math.round((dailyAchieved / dailyMax) * 100) : 0;
+
+  if (dailyScoreEl) dailyScoreEl.innerText = `${dailyAchieved} / ${dailyMax}`;
+  if (dailyPercentTextEl) dailyPercentTextEl.innerText = `${dailyPercent}%`;
+  if (dailyProgressEl) dailyProgressEl.style.width = `${dailyPercent}%`;
+
+  // --- 2. РАСЧЕТ ЗА НЕДЕЛЮ (ПН-ПТ) ---
   const distToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   const monday = new Date(dateObj);
   monday.setDate(dateObj.getDate() + distToMonday);
@@ -309,12 +320,10 @@ function calculateStudentTotals() {
     const dWeek = tempDate.getDay();
     const dSubjects = timetable[dWeek] || [];
 
-    // База 100% недели строится СТРОГО по 5 рабочим дням (ПН-ПТ, где dWeek от 1 до 5)
     if (dWeek >= 1 && dWeek <= 5) {
       weeklyMax += (dSubjects.length * 5) + (dailyHabits.length * 5);
     }
 
-    // Баллы суммируются за весь период
     dSubjects.forEach(s => { weeklyAchieved += dScores[s] || 0; });
     dailyHabits.forEach(h => { weeklyAchieved += dScores[h.id] || 0; });
   }
@@ -399,7 +408,6 @@ function getMonthStats(scores, timetable, monthStr) {
     const dSubjects = timetable[dWeek] || [];
     const dScores = scores[dateStr] || {};
 
-    // Учитываем максимумы только рабочих дней для стандартизации месяца
     if (dWeek >= 1 && dWeek <= 5) {
       max += (dSubjects.length * 5) + (dailyHabits.length * 5);
     }
