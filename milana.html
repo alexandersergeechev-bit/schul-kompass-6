@@ -19,7 +19,7 @@
 
     <!-- Блок со статистикой: День, Неделя, Месяц -->
     <section class="stats-summary">
-      <!-- Карточка дня с процентами -->
+      <!-- Карточка дня с процентами и медалями -->
       <div class="stat-card">
         <h3>Tag (День)</h3>
         <div class="score-row">
@@ -27,6 +27,25 @@
           <span class="percent-badge" id="daily-percent-text">0%</span>
         </div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" id="daily-progress"></div></div>
+
+        <!-- Бейджи уровней дня (70%, 80%, 90%) -->
+        <div class="level-badges">
+          <div class="badge" id="daily-badge-bronze" title="70% - Bronze Level">
+            <span class="badge-icon">🥉</span>
+            <span class="badge-name">Bronze</span>
+            <span class="badge-target">70%</span>
+          </div>
+          <div class="badge" id="daily-badge-silber" title="80% - Silber Level">
+            <span class="badge-icon">🥈</span>
+            <span class="badge-name">Silber</span>
+            <span class="badge-target">80%</span>
+          </div>
+          <div class="badge" id="daily-badge-gold" title="90% - Gold Level">
+            <span class="badge-icon">🥇</span>
+            <span class="badge-name">Gold</span>
+            <span class="badge-target">90%</span>
+          </div>
+        </div>
       </div>
 
       <!-- Карточка недели с Progress Bar и Level Badges -->

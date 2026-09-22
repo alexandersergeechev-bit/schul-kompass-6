@@ -303,6 +303,15 @@ function calculateStudentTotals() {
   if (dailyPercentTextEl) dailyPercentTextEl.innerText = `${dailyPercent}%`;
   if (dailyProgressEl) dailyProgressEl.style.width = `${dailyPercent}%`;
 
+  // Бейджи дня (бронза 70%, серебро 80%, золото 90%)
+  const dBadgeBronze = document.getElementById("daily-badge-bronze");
+  const dBadgeSilber = document.getElementById("daily-badge-silber");
+  const dBadgeGold = document.getElementById("daily-badge-gold");
+
+  if (dBadgeBronze) dBadgeBronze.classList.toggle("active", dailyPercent >= 70);
+  if (dBadgeSilber) dBadgeSilber.classList.toggle("active", dailyPercent >= 80);
+  if (dBadgeGold) dBadgeGold.classList.toggle("active", dailyPercent >= 90);
+
   // --- 2. РАСЧЕТ ЗА НЕДЕЛЮ (ПН-ПТ) ---
   const distToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   const monday = new Date(dateObj);
